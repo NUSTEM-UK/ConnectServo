@@ -19,6 +19,7 @@ typedef void (*GenericFP)(void *, ...);
 class ServoQueueItem {
     public:
         ServoQueueItem();
+        void assign(GenericFP, int, const char *, int);
         GenericFP call;             // eg. startEaseTo, moveTo/write, waitForServo
         int param1;                 // Target position or (for waitForServo) servo to wait on.
         const char * animationType; // eg. 'EASE_CUBIC_IN_OUT'
