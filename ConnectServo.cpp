@@ -5,11 +5,11 @@ ServoQueueItem::ServoQueueItem() {
 
 };
 
-void ServoQueueItem::assign(GenericFP call, int param1, const char * animationType, int servoSpeed) {
-    this->call = call;
-    this->param1 = param1;
-    this->animationType = animationType;
-    this->servoSpeed = servoSpeed;
+void ServoQueueItem::assign(GenericFP newCall, int newParam1, const char * newAnimationType, int newServoSpeed) {
+    call = newCall;
+    param1 = newParam1;
+    animationType = newAnimationType;
+    servoSpeed = newServoSpeed;
 }
 
 // Initialize the servo object, passing an initializer list to the cppQueue object
