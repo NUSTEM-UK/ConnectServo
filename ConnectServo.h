@@ -31,7 +31,7 @@ class ConnectServo : public ServoEasing {
         ConnectServo();
         void enqueue(ServoQueueItem item);
         ServoQueueItem dequeue();
-        // cppQueue servoQueue;
+        void update();
     private:
         cppQueue _servoQueue;
         ServoQueueItem _queueItem1;

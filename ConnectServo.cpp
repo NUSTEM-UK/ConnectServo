@@ -27,3 +27,11 @@ ServoQueueItem ConnectServo::dequeue() {
     _servoQueue.pop(&_item);
     return _item;
 };
+
+void ConnectServo::update() {
+    if (!isMovingAndCallYield()) {
+        // We've stopped, so pop the next queue item
+        ServoQueueItem item = dequeue();
+        self.&(item.call)(item.param1, item.animationType, item.servoSpeed));
+    }
+};
