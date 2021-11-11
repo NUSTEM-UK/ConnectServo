@@ -7,6 +7,8 @@ ConnectServo servo2;
 // Instantiate an object to hold our tempoorary values
 ServoQueueItem myItem;
 
+uint8_t i = 0;
+
 void setup() {
     Serial.begin(115200);
     Serial.println();
@@ -33,22 +35,18 @@ void setup() {
     servo2.enqueue(myItem);
     myItem.assign(STARTEASETO, 0, EASE_CUBIC_IN_OUT, 150);
     servo2.enqueue(myItem);
-    myItem.assign(STARTEASETO, 180, EASE_LINEAR, 255);
+    // 3 wiggles
+    // TODO: check if write actually works, or reports
+    //       as finished after every dispatch.
+    while (i < 3) {
+        myItem.assign(STARTEASETO, 180, EASE_LINEAR, 255);
+        servo2.enqueue(myItem);
+        myItem.assign(STARTEASETO, 0, EASE_LINEAR, 255);
+        servo2.enqueue(myItem);
+        i++;
+    }
+    myItem.assign(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 20);
     servo2.enqueue(myItem);
-    myItem.assign(STARTEASETO, 0, EASE_LINEAR, 255);
-    servo2.enqueue(myItem);
-
-    myItem.assign(STARTEASETO, 180, EASE_LINEAR, 255);
-    servo2.enqueue(myItem);
-    myItem.assign(STARTEASETO, 0, EASE_LINEAR, 255);
-    servo2.enqueue(myItem);
-
-    myItem.assign(STARTEASETO, 180, EASE_LINEAR, 255);
-    servo2.enqueue(myItem);
-    myItem.assign(STARTEASETO, 0, EASE_LINEAR, 255);
-    servo2.enqueue(myItem);
-
-    myItem.assign(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 150);
 
 
 }
