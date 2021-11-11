@@ -27,11 +27,11 @@ class ServoQueueItem {
         ServoQueueItem();
         // call, target position, animation type, servo speed
         // TODO: replace with uint8_t
-        void assign(int, int, uint8_t, int);
-        int call;                   // int representing call; we'll parse in ConnectServo::update()
-        int param1;                 // Target position or (for waitForServo) servo to wait on.
+        void assign(uint8_t, uint8_t, uint8_t, uint8_t);
+        uint8_t call;                   // int representing call; we'll parse in ConnectServo::update()
+        uint8_t param1;                 // Target position or (for waitForServo) servo to wait on.
         uint8_t animationType; // eg. 'EASE_CUBIC_IN_OUT'
-        int servoSpeed;             // Slew rate (perscentage: map to 0-255. Servo theoretical max is around 200 degrees/sec, ~80%)
+        uint8_t servoSpeed;             // Slew rate (perscentage: map to 0-255. Servo theoretical max is around 200 degrees/sec, ~80%)
 };
 
 class ConnectServo : public ServoEasing {
@@ -39,7 +39,7 @@ class ConnectServo : public ServoEasing {
         ConnectServo();
         void enqueue(ServoQueueItem item);
         ServoQueueItem dequeue();
-        void update();
+        bool update();
     private:
         cppQueue _servoQueue;
         ServoQueueItem _queueItem1;

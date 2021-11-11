@@ -5,7 +5,7 @@ ServoQueueItem::ServoQueueItem() {
 
 };
 
-void ServoQueueItem::assign(int newCall, int newParam1, uint8_t newAnimationType, int newServoSpeed) {
+void ServoQueueItem::assign(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint8_t newServoSpeed) {
     call = newCall;
     param1 = newParam1;
     animationType = newAnimationType;
@@ -28,16 +28,20 @@ ServoQueueItem ConnectServo::dequeue() {
     return _item;
 };
 
-void ConnectServo::update() {
+bool ConnectServo::update() {
     if (!isMovingAndCallYield()) {
-        Serial.println("Servo stopped, retrieving next queue action.");
+        // Serial.println("Servo stopped, retrieving next queue action.");
         // We've stopped, so check if there's anything in the queue
         if (!_servoQueue.isEmpty()) {
-            Serial.println("Popping next action");
+            // Serial.println("Popping next action");
             // There's something in the queue, so pop it and execute it
             ServoQueueItem item = dequeue();
             // Get the targetFunction from item.call
 
+            // Decaode the call and dispatch.
+            // This is hacky, but I can't pass a pointer to a member function
+            // since - as best I can tell - C++ doesn't do that.
+            // Hence the parser macro definitions
             switch (item.call) {
                 case STARTEASETO:
                     startEaseTo(item.param1, item.animationType, item.servoSpeed);
@@ -62,6 +66,9 @@ void ConnectServo::update() {
                 default:
                     break;
             }
+            return true;
+        } else {
+            return false;
         }
     }
 };

@@ -6,8 +6,6 @@ ConnectServo servo1;
 
 // Give ourselves some placeholder things to work with
 ServoQueueItem myItem;
-int value = 12;
-int speed = 30;
 
 void setup() {
     Serial.begin(115200);
@@ -34,5 +32,10 @@ void setup() {
 }
 
 void loop() {
-    servo1.update();
+    if (!servo1.update()) {
+        // It's stopped with an empty queue, so we're done
+        Serial.println("Disconnecting servo 1");
+        servo1.detach();
+    }
+
 }
