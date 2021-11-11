@@ -26,7 +26,6 @@ class ServoQueueItem {
     public:
         ServoQueueItem();
         // call, target position, animation type, servo speed
-        // TODO: replace with uint8_t
         void assign(uint8_t, uint8_t, uint8_t, uint8_t);
         uint8_t call;                   // int representing call; we'll parse in ConnectServo::update()
         uint8_t param1;                 // Target position or (for waitForServo) servo to wait on.

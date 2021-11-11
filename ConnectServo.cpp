@@ -44,7 +44,8 @@ bool ConnectServo::update() {
             // Hence the parser macro definitions
             switch (item.call) {
                 case STARTEASETO:
-                    startEaseTo(item.param1, item.animationType, item.servoSpeed);
+                    setEasingType(item.animationType);
+                    startEaseTo(item.param1, item.servoSpeed);
                     Serial.print("Ease move dispatched: ");
                     Serial.print(item.param1);
                     Serial.print(" ");
