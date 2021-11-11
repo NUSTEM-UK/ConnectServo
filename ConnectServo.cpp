@@ -5,7 +5,7 @@ ServoQueueItem::ServoQueueItem() {
 
 };
 
-void ServoQueueItem::assign(GenericFP newCall, int newParam1, const char * newAnimationType, int newServoSpeed) {
+void ServoQueueItem::assign(int newCall, int newParam1, uint8_t newAnimationType, int newServoSpeed) {
     call = newCall;
     param1 = newParam1;
     animationType = newAnimationType;
@@ -30,8 +30,38 @@ ServoQueueItem ConnectServo::dequeue() {
 
 void ConnectServo::update() {
     if (!isMovingAndCallYield()) {
-        // We've stopped, so pop the next queue item
-        ServoQueueItem item = dequeue();
-        self.&(item.call)(item.param1, item.animationType, item.servoSpeed));
+        Serial.println("Servo stopped, retrieving next queue action.");
+        // We've stopped, so check if there's anything in the queue
+        if (!_servoQueue.isEmpty()) {
+            Serial.println("Popping next action");
+            // There's something in the queue, so pop it and execute it
+            ServoQueueItem item = dequeue();
+            // Get the targetFunction from item.call
+
+            switch (item.call) {
+                case STARTEASETO:
+                    startEaseTo(item.param1, item.animationType, item.servoSpeed);
+                    Serial.print("Ease move dispatched: ");
+                    Serial.print(item.param1);
+                    Serial.print(" ");
+                    Serial.print(item.animationType);
+                    Serial.print(" ");
+                    Serial.println(item.servoSpeed);
+                    break;
+                case WRITE:
+                    write(item.param1);
+                    Serial.print("Write move dispatched: ");
+                    Serial.println(item.param1);
+                    break;
+                case WAIT_FOR_OTHER_SERVO:
+                    Serial.println("WAIT FOR SERVO: Yeah, we need to implement this");
+                    break;
+                case WAIT_FOR_LEDS:
+                    Serial.println("WAIT FOR LEDS: Yeah, we need to implement this");
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 };

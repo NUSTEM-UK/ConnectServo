@@ -5,8 +5,14 @@
 #define IMPLEMENTATION FIFO
 #define QUEUE_SIZE_ITEMS 20
 
+// Parser macros
+#define STARTEASETO 0
+#define WRITE 1
+#define WAIT_FOR_OTHER_SERVO 2
+#define WAIT_FOR_LEDS 3
+
 // Generic function pointer. Note variable-length argument list
-typedef void (*GenericFP)(void *, ...);
+// typedef void (*GenericFP)(void *, ...);
 
 // Servo queue item type
 // typedef struct {
@@ -19,10 +25,12 @@ typedef void (*GenericFP)(void *, ...);
 class ServoQueueItem {
     public:
         ServoQueueItem();
-        void assign(GenericFP, int, const char *, int);
-        GenericFP call;             // eg. startEaseTo, moveTo/write, waitForServo
+        // call, target position, animation type, servo speed
+        // TODO: replace with uint8_t
+        void assign(int, int, uint8_t, int);
+        int call;                   // int representing call; we'll parse in ConnectServo::update()
         int param1;                 // Target position or (for waitForServo) servo to wait on.
-        const char * animationType; // eg. 'EASE_CUBIC_IN_OUT'
+        uint8_t animationType; // eg. 'EASE_CUBIC_IN_OUT'
         int servoSpeed;             // Slew rate (perscentage: map to 0-255. Servo theoretical max is around 200 degrees/sec, ~80%)
 };
 
