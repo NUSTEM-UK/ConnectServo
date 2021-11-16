@@ -17,8 +17,8 @@ class ConnectServo : public ServoEasing {
         ConnectServo();
         void queueEaseTo(uint8_t, uint8_t, uint16_t);
         void queueMoveTo(uint8_t);
-        void queueWaitForServo(ConnectServo*);
-        void queueMessageServo(ConnectServo*);
+        void queueWaitForServo(ConnectServo&);
+        void queueMessageServo(ConnectServo&);
         void enqueue(uint8_t, uint8_t, uint8_t, uint16_t, ConnectServo *);
         void enqueue(uint8_t, uint8_t, uint8_t, uint16_t);
         void enqueue(uint8_t, uint8_t);

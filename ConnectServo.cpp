@@ -6,28 +6,6 @@ ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_IT
 
 };
 
-// void ConnectServo::enqueue(ServoQueueItem item) {
-//   _servoQueue.push(&item);
-// };
-
-void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed, ConnectServo *) {
-    ServoQueueItem item;
-    item.assign(newCall, newParam1, newAnimationType, newServoSpeed, NULL);
-    _servoQueue.push(&item);
-};
-
-void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
-    ServoQueueItem item;
-    item.assign(newCall, newParam1, newAnimationType, newServoSpeed, NULL);
-    _servoQueue.push(&item);
-};
-
-void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1) {
-    ServoQueueItem item;
-    item.assign(newCall, newParam1, NULL, NULL, NULL);
-    _servoQueue.push(&item);
-};
-
 void ConnectServo::queueEaseTo(uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
     ServoQueueItem item;
     item.assign(STARTEASETO, newParam1, newAnimationType, newServoSpeed, NULL);
@@ -40,19 +18,20 @@ void ConnectServo::queueMoveTo(uint8_t newParam1) {
     _servoQueue.push(&item);
 };
 
-void ConnectServo::queueWaitForServo(ConnectServo* targetServo) {
+void ConnectServo::queueWaitForServo(ConnectServo& targetServo) {
     ServoQueueItem item;
-    item.assign(WAIT_FOR_OTHER_SERVO, NULL, NULL, NULL, targetServo);
+    item.assign(WAIT_FOR_OTHER_SERVO, NULL, NULL, NULL, &targetServo);
     _servoQueue.push(&item);
 };
 
-void ConnectServo::queueMessageServo(ConnectServo* targetServo) {
+void ConnectServo::queueMessageServo(ConnectServo& targetServo) {
     ServoQueueItem item;
-    item.assign(MESSAGE_SERVO, NULL, NULL, NULL, targetServo);
+    item.assign(MESSAGE_SERVO, NULL, NULL, NULL, &targetServo);
     _servoQueue.push(&item);
 };
 
 void ConnectServo::unblockFromServo(void) {
+    Serial.println("BLOCK LIFTED");
     _waitingForServo = false;
 }
 
@@ -95,6 +74,7 @@ bool ConnectServo::update() {
                 case WAIT_FOR_OTHER_SERVO:
                     Serial.println("WAIT FOR SERVO triggered");
                     _waitingForServo = true;
+                    Serial.println("BLOCK SET");
                     item.targetServo->queueMessageServo(this);
                     break;
                 case WAIT_FOR_LEDS:
@@ -113,3 +93,31 @@ bool ConnectServo::update() {
         }
     }
 };
+
+
+/**
+ * pretty sure we don't need any of this still
+ *
+ */
+
+// void ConnectServo::enqueue(ServoQueueItem item) {
+//   _servoQueue.push(&item);
+// };
+
+// void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed, ConnectServo *) {
+//     ServoQueueItem item;
+//     item.assign(newCall, newParam1, newAnimationType, newServoSpeed, NULL);
+//     _servoQueue.push(&item);
+// };
+
+// void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
+//     ServoQueueItem item;
+//     item.assign(newCall, newParam1, newAnimationType, newServoSpeed, NULL);
+//     _servoQueue.push(&item);
+// };
+
+// void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1) {
+//     ServoQueueItem item;
+//     item.assign(newCall, newParam1, NULL, NULL, NULL);
+//     _servoQueue.push(&item);
+// };
