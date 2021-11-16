@@ -46,16 +46,16 @@ bool ConnectServo::update() {
                 case STARTEASETO:
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);
-                    Serial.print("Ease move dispatched: ");
-                    Serial.print(item.param1);
-                    Serial.print(" ");
-                    Serial.print(item.animationType);
-                    Serial.print(" ");
-                    Serial.println(item.servoSpeed);
+                    // Serial.print("Ease move dispatched: ");
+                    // Serial.print(item.param1);
+                    // Serial.print(" ");
+                    // Serial.print(item.animationType);
+                    // Serial.print(" ");
+                    // Serial.println(item.servoSpeed);
                     break;
                 case WRITE:
                     write(item.param1);
-                    Serial.print("Write move dispatched: ");
+                    // Serial.print("Write move dispatched: ");
                     Serial.println(item.param1);
                     break;
                 case WAIT_FOR_OTHER_SERVO:
