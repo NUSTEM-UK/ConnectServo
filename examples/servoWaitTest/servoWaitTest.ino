@@ -21,8 +21,8 @@ void setup() {
 
     servo1.queueEaseTo(180, EASE_CUBIC_IN_OUT, 60);
     servo1.queueEaseTo(0, EASE_CUBIC_IN_OUT, 90);
-    servo2.queueWaitForServo(&servo1);
-    servo1.queueEaseTo(180, EASE_CUBIC_IN_OUT, 60);
+    // servo2.queueWaitForServo(&servo1);
+    // servo1.queueEaseTo(180, EASE_CUBIC_IN_OUT, 60);
     servo2.queueEaseTo(180, EASE_CUBIC_IN_OUT, 60);
 
 }
