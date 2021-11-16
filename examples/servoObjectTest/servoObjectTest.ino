@@ -22,9 +22,9 @@ void setup() {
     // Queue some moves for the servo objects
     servo1.enqueue(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 30);
     // servo1.enqueue(myItem);
-    servo1.enqueue(WRITE, 0, 0, 0);
+    servo1.enqueue(WRITE, 0);
     servo1.enqueue(STARTEASETO, 90, EASE_SINE_IN, 100);
-    servo1.enqueue(WRITE, 180, 0, 0);
+    servo1.enqueue(WRITE, 180);
     servo1.enqueue(STARTEASETO, 0, EASE_SINE_OUT, 50);
 
     servo2.enqueue(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 30);
