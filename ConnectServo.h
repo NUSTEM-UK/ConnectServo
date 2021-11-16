@@ -36,7 +36,7 @@ class ServoQueueItem {
 class ConnectServo : public ServoEasing {
     public:
         ConnectServo();
-        void enqueue(ServoQueueItem item);
+        void enqueue(uint8_t, uint8_t, uint8_t, uint16_t);
         ServoQueueItem dequeue();
         bool update();
     private:
