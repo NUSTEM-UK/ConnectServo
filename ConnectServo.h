@@ -37,6 +37,7 @@ class ConnectServo : public ServoEasing {
     public:
         ConnectServo();
         void enqueue(uint8_t, uint8_t, uint8_t, uint16_t);
+        void enqueue(uint8_t, uint8_t);
         ServoQueueItem dequeue();
         bool update();
     private:

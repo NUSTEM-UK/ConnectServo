@@ -28,6 +28,12 @@ void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimat
     _servoQueue.push(&item);
 };
 
+void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1) {
+    ServoQueueItem item;
+    item.assign(newCall, newParam1, NULL, NULL);
+    _servoQueue.push(&item);
+};
+
 ServoQueueItem ConnectServo::dequeue() {
     ServoQueueItem _item;
     _servoQueue.pop(&_item);
