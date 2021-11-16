@@ -18,8 +18,14 @@ ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_IT
 
 };
 
-void ConnectServo::enqueue(ServoQueueItem item) {
-  _servoQueue.push(&item);
+// void ConnectServo::enqueue(ServoQueueItem item) {
+//   _servoQueue.push(&item);
+// };
+
+void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
+    ServoQueueItem item;
+    item.assign(newCall, newParam1, newAnimationType, newServoSpeed);
+    _servoQueue.push(&item);
 };
 
 ServoQueueItem ConnectServo::dequeue() {
