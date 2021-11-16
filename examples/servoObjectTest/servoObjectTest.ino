@@ -2,14 +2,12 @@
 #include <ConnectServo.h>
 
 ConnectServo servo1;
+ConnectServo servo2;
 
-
-// Give ourselves some placeholder things to work with
+// Instantiate an object to hold our tempoorary values
 ServoQueueItem myItem;
-void myFunction1(void *skip, ...);
-void myFunction2(void *skip, ...);
-int value = 12;
-int speed = 30;
+
+uint8_t i = 0;
 
 void setup() {
     Serial.begin(115200);
@@ -17,83 +15,52 @@ void setup() {
     Serial.println("Starting...");
     servo1.attach(D5);
     servo1.write(0);
+    servo2.attach(D7);
+    servo2.write(0);
     delay(500);
 
-
-
-    // myItem = {&myFunction1, value, "EASE_CUBIC_IN_OUT", speed};
-    myItem.assign(&myFunction1, value, "EASE_CUBIC_IN_OUT", speed);
-
-    // myItem.call = &myFunction1;
-    // myItem.param1 = value;
-    // myItem.animationType = "EASE_CUBIC_IN_OUT";
-    // myItem.servoSpeed = 100;
-    // myItem = {&myFunction1, value, 'EASE_CUBIC_IN_OUT', speed};
+    // Queue some moves for the servo objects
+    myItem.assign(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 30);
+    servo1.enqueue(myItem);
+    myItem.assign(WRITE, 0, 0, 0);
+    servo1.enqueue(myItem);
+    myItem.assign(STARTEASETO, 90, EASE_SINE_IN, 100);
+    servo1.enqueue(myItem);
+    myItem.assign(WRITE, 180, 0, 0);
+    servo1.enqueue(myItem);
+    myItem.assign(STARTEASETO, 0, EASE_SINE_OUT, 50);
     servo1.enqueue(myItem);
 
-    // myItem = {&myFunction2, 1, "EASE_BACK_BOUNCINIG", 200};
-    myItem.assign(&myFunction2, 1, "EASE_BACK_BOUNCING", 200);
+    myItem.assign(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 30);
+    servo2.enqueue(myItem);
+    myItem.assign(STARTEASETO, 0, EASE_CUBIC_IN_OUT, 150);
+    servo2.enqueue(myItem);
+    // 3 wiggles
+    // TODO: check if write actually works, or reports
+    //       as finished after every dispatch.
+    while (i < 3) {
+        myItem.assign(STARTEASETO, 180, EASE_LINEAR, 255);
+        servo2.enqueue(myItem);
+        myItem.assign(STARTEASETO, 0, EASE_LINEAR, 255);
+        servo2.enqueue(myItem);
+        i++;
+    }
+    myItem.assign(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 20);
+    servo2.enqueue(myItem);
 
-    // myItem.call = &myFunction2;
-    // delay(50);
-    // myItem.param1 = 1;
-    // myItem.animationType = "EASE_BACK_BOUNCING";
-    // myItem.servoSpeed = 200;
-
-    // myItem = {&myFunction2, 1, 'EASE_BACK_BOUNCING', 200};
-    servo1.enqueue(myItem);
-
-    myItem = servo1.dequeue();
-    Serial.print("Dequeued: ");
-    // Serial.print(myItem.call);
-    // Serial.print(" ");
-    Serial.print(myItem.param1);
-    Serial.print(" ");
-    Serial.print(myItem.animationType);
-    Serial.print(" ");
-    Serial.println(myItem.servoSpeed);
-
-    myItem = servo1.dequeue();
-    Serial.print("Dequeued: ");
-    // Serial.print(myItem.call);
-    // Serial.print(" ");
-    Serial.print(myItem.param1);
-    Serial.print(" ");
-    Serial.print(myItem.animationType);
-    Serial.print(" ");
-    Serial.println(myItem.servoSpeed);
 
 }
 
 void loop() {
-    servo1.startEaseTo(180, 30);
-    while (servo1.isMovingAndCallYield() ) {
-        delay(10);
+    if (!servo1.update()) {
+        // It's stopped with an empty queue, so we're done
+        // Serial.println("Disconnecting servo 1");
+        servo1.detach();
+        // TODO: Ah, this triggers every pass through the loop. Oops.
     }
-    servo1.write(0);
-    while (servo1.isMovingAndCallYield() ) {
-        delay(10);
+    if (!servo2.update()) {
+        // It's stopped with an empty queue, so we're done
+        // Serial.println("Disconnecting servo 2");
+        servo2.detach();
     }
-}
-
-void myFunction1(void *skip, ...)
-{
-    va_list args;
-    va_start(args, skip);
-    int foo1 = va_arg(args, int);
-    Serial.print("myFunction1 = ");
-    Serial.println(foo1);
-}
-
-void myFunction2(void *skip, ...)
-{
-    va_list args;
-    va_start(args, skip);
-    int foo1 = va_arg(args, int);
-    float foo2 = (float)va_arg(args, double);
-
-    Serial.print("myFunction2 = ");
-    Serial.print(foo1);
-    Serial.print(", ");
-    Serial.println(foo2);
 }
