@@ -2,7 +2,6 @@
 #include <ServoEasing.h>
 #include <cppQueue.h>
 #include <ServoQueueItem.h>
-#include <Callback.h>
 
 #define IMPLEMENTATION FIFO
 #define QUEUE_SIZE_ITEMS 20
@@ -30,8 +29,6 @@ class ConnectServo : public ServoEasing {
         void unblockFromServo(uint8_t);
         void unblockFromLED(void);
         bool update();
-        Signal<uint8_t> signalToUnblock;
-        MethodSlot<void, uint8_t> slotToUnblock;
     private:
         uint8_t _servoPin;
         cppQueue _servoQueue;
@@ -41,10 +38,3 @@ class ConnectServo : public ServoEasing {
         uint8_t _waitingForServo;
         uint8_t _waitingForLED;
 };
-
-class AlertsManager {
-    uint8_t signalSender;
-    public:
-        void OnUnblockSignalReceived(uint8_t )  {}
-} alerter;
-
