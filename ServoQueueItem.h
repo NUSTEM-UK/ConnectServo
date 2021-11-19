@@ -18,10 +18,10 @@ class ServoQueueItem {
     public:
         ServoQueueItem();
         // call, target position, animation type, servo speed
-        void assign(uint8_t, uint8_t, uint8_t, uint16_t, ConnectServo&);
+        void assign(uint8_t, uint8_t, uint8_t, uint16_t, uint8_t);
         uint8_t call;                   // int representing call; we'll parse in ConnectServo::update()
         uint8_t param1;                 // Target position or (for waitForServo) servo to wait on.
         uint8_t animationType; // eg. 'EASE_CUBIC_IN_OUT'
-        uint16_t servoSpeed;             // Slew rate (perscentage: map to 0-255. Servo theoretical max is around 200 degrees/sec, ~80%)
-        ConnectServo& targetServo;
+        uint16_t servoSpeed;            // Slew rate (perscentage: map to 0-255. Servo theoretical max is around 200 degrees/sec, ~80%)
+        uint8_t targetServo;            // Servo pins are of type static const uint8_t
 };

@@ -20,24 +20,24 @@ void setup() {
     delay(500);
 
     // Queue some moves for the servo objects
-    servo1.enqueue(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 30);
+    servo1.queueEaseTo(180, EASE_CUBIC_IN_OUT, 30);
     // servo1.enqueue(myItem);
-    servo1.enqueue(WRITE, 0);
-    servo1.enqueue(STARTEASETO, 90, EASE_SINE_IN, 100);
-    servo1.enqueue(WRITE, 180);
-    servo1.enqueue(STARTEASETO, 0, EASE_SINE_OUT, 50);
+    servo1.queueMoveTo(0);
+    servo1.queueEaseTo(90, EASE_SINE_IN, 100);
+    servo1.queueMoveTo(180);
+    servo1.queueEaseTo(0, EASE_SINE_OUT, 50);
 
-    servo2.enqueue(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 30);
-    servo2.enqueue(STARTEASETO, 0, EASE_CUBIC_IN_OUT, 150);
+    servo2.queueEaseTo(180, EASE_CUBIC_IN_OUT, 30);
+    servo2.queueEaseTo(0, EASE_CUBIC_IN_OUT, 150);
     // 3 wiggles
     // TODO: check if write actually works, or reports
     //       as finished after every dispatch.
     while (i < 3) {
-        servo2.enqueue(STARTEASETO, 180, EASE_LINEAR, 255);
-        servo2.enqueue(STARTEASETO, 0, EASE_LINEAR, 255);
+        servo2.queueEaseTo(180, EASE_LINEAR, 255);
+        servo2.queueEaseTo(0, EASE_LINEAR, 255);
         i++;
     }
-    servo2.enqueue(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 20);
+    servo2.queueEaseTo(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 20);
 
 }
 
