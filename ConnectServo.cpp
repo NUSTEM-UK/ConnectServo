@@ -10,10 +10,15 @@ void ConnectServo::setPin(uint8_t pin) {
     _servoPin = pin;
     attach(_servoPin);
     write(0);
+    registerServo();
 }
 
 uint8_t ConnectServo::getPin() {
     return _servoPin;
+}
+
+void ConnectServo::registerServo() {
+    ConnectMessenger.registerServo(&this, _servoPin);
 }
 
 void ConnectServo::queueEaseTo(uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {

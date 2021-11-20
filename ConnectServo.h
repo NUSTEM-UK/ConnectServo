@@ -2,6 +2,7 @@
 #include <ServoEasing.h>
 #include <cppQueue.h>
 #include <ServoQueueItem.h>
+#include <ServoMessenger.h>
 
 #define IMPLEMENTATION FIFO
 #define QUEUE_SIZE_ITEMS 20
@@ -12,6 +13,8 @@
 #define WAIT_FOR_SERVO 2
 #define WAIT_FOR_LEDS 3
 #define MESSAGE_SERVO 4
+
+ServoMessenger ConnectMessenger;
 
 class ConnectServo : public ServoEasing {
     public:
@@ -26,6 +29,7 @@ class ConnectServo : public ServoEasing {
         // void enqueue(uint8_t, uint8_t, uint8_t, uint16_t);
         // void enqueue(uint8_t, uint8_t);
         ServoQueueItem dequeue();
+        void registerServo();
         void unblockFromServo(uint8_t);
         void unblockFromLED(void);
         bool update();
