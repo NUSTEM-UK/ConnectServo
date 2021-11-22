@@ -13,6 +13,7 @@ void ConnectServo::setPin(uint8_t pin) {
     attach(_servoPin);
     write(0);
     registerServo();
+    _servoAttached = true;
 }
 
 uint8_t ConnectServo::getPin() {
@@ -38,6 +39,8 @@ void ConnectServo::queueMoveTo(uint8_t newParam1) {
     // FIXME: this doesn't complete before the servo is detached either.
     //        needs timeout on detach at end of move.
     item.assign(STARTEASETO, newParam1, EASE_LINEAR, 1023, NULL);
+    _servoQueue.push(&item);
+    item.assign(WAIT, NULL, NULL, SERVO_MOVE_SLEW_WAIT, NULL);
     _servoQueue.push(&item);
 };
 
@@ -80,10 +83,19 @@ void ConnectServo::checkTime() {
         if (millis() > _targetTime) {
             _waitingForTime = false;
         }
+    } else if (_emptiedQueue && _servoAttached) {
+        if (millis() > _lastUpdate + SERVO_TIMEOUT_MS) {
+            Serial.print("Servo on pin: ");
+            Serial.print(_servoPin);
+            Serial.println(": TIMEOUT, detaching");
+            detach();
+            // Unset the flag so we don't try to detach again
+            _servoAttached = false;
+        }
     }
 };
 
-bool ConnectServo::update() {
+void ConnectServo::update() {
 
     // Check if we're paused
     checkTime();
@@ -101,6 +113,8 @@ bool ConnectServo::update() {
             Serial.println(": stopped, retrieving next queue action.");
             // There's something in the queue, so pop it and execute it
             ServoQueueItem item = dequeue();
+            // Item popped from queue, so flag that.
+            _emptiedQueue = false;
 
             // Get the targetFunction from item.call
             // Decaode the call and dispatch.
@@ -113,10 +127,6 @@ bool ConnectServo::update() {
                     Serial.print(_servoPin);
                     Serial.print(": START EASING MOVE to ");
                     Serial.println(item.param1);
-                    // FIXME: This is to work around over-zealous detach in
-                    //        example code main loop. Needs a timeout on detach,
-                    //        and probably trigger attach at start of mood call.
-                    attach(_servoPin);
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);
                     break;
@@ -160,9 +170,16 @@ bool ConnectServo::update() {
                 default:
                     break;
             }
-            return true;
         } else {
-            return false;
+            // If this is the first tme we've falled through queue check,
+            // flag that and take a tiemstamp.
+            if (!_emptiedQueue) {
+                Serial.print("Servo on pin: ");
+                Serial.print(_servoPin);
+                Serial.println(": Queue emptied, triggering timeout wait");
+                _emptiedQueue = true;
+                _lastUpdate = millis();
+            }
         }
     }
 };
