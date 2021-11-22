@@ -35,7 +35,7 @@ void ServoMessenger::sendServoMessage(uint8_t fromServoPin, uint8_t toServoPin) 
         if (_servoList[i].servoPin == fromServoPin) {
             // Found the servo, call unblockFromServo
             _servoList[i].servoReference->unblockFromServo(toServoPin);
-            _servoList[i].servoReference->unblockFromServo(fromServoPin);
+            // _servoList[i].servoReference->unblockFromServo(fromServoPin);
         }
     }
 }
