@@ -32,14 +32,11 @@ void ConnectServo::queueEaseTo(uint8_t newParam1, uint8_t newAnimationType, uint
 
 void ConnectServo::queueMoveTo(uint8_t newParam1) {
     ServoQueueItem item;
-    // item.assign(WRITE, newParam1, NULL, NULL, NULL);
-    // TODO: Check if we can get write() to work, but it looks like
-    // ServoEasing thinks the transit time is 0 so dequeing is cruddy.
-    // Hence we fudge it with a maximum-rate linear ease to.
-    // FIXME: this doesn't complete before the servo is detached either.
-    //        needs timeout on detach at end of move.
-    item.assign(STARTEASETO, newParam1, EASE_LINEAR, 1023, NULL);
+    // Can do this either with write() or a maximum-rate startEaseTo().
+    item.assign(WRITE, newParam1, NULL, NULL, NULL);
+    // item.assign(STARTEASETO, newParam1, EASE_LINEAR, 1023, NULL);
     _servoQueue.push(&item);
+    // Queue a short pause so there's somet movement.
     item.assign(WAIT, NULL, NULL, SERVO_MOVE_SLEW_WAIT, NULL);
     _servoQueue.push(&item);
 };
@@ -115,6 +112,14 @@ void ConnectServo::update() {
             ServoQueueItem item = dequeue();
             // Item popped from queue, so flag that.
             _emptiedQueue = false;
+            // Re-attach the servo
+            if (!_servoAttached) {
+                Serial.print("Servo on pin: ");
+                Serial.print(_servoPin);
+                Serial.println(": re-attaching.");
+                attach(_servoPin);
+                _servoAttached = true;
+            }
 
             // Get the targetFunction from item.call
             // Decaode the call and dispatch.
@@ -132,7 +137,9 @@ void ConnectServo::update() {
                     break;
                 case WRITE:
                     write(item.param1);
-                    // Serial.print("Write move dispatched: ");
+                    Serial.print("Servo on pin: ");
+                    Serial.print(_servoPin);
+                    Serial.print(": WRITE MOVE to ");
                     Serial.println(item.param1);
                     break;
                 case WAIT_FOR_SERVO:
@@ -141,11 +148,6 @@ void ConnectServo::update() {
                     Serial.print(": BLOCK FOR SERVO on pin ");
                     Serial.println(item.targetServo);
                     _waitingForServo = item.targetServo;
-                    // uint8_t targetServoID = item.targetServo;
-                    // gConnectEventManager.addListener(getPin(), this->unblockFromServo);
-                    // Queue a MessageServo event passing item.targetServo as identifier
-
-                    // item.targetServo->queueMessageServo(this);
                     break;
                 case WAIT_FOR_LEDS:
                     Serial.println("WAIT FOR LEDS: Yeah, we need to implement this");
@@ -171,7 +173,7 @@ void ConnectServo::update() {
                     break;
             }
         } else {
-            // If this is the first tme we've falled through queue check,
+            // If this is the first tme we've fallen through queue check,
             // flag that and take a tiemstamp.
             if (!_emptiedQueue) {
                 Serial.print("Servo on pin: ");
@@ -183,31 +185,3 @@ void ConnectServo::update() {
         }
     }
 };
-
-
-/**
- * pretty sure we don't need any of this still
- *
- */
-
-// void ConnectServo::enqueue(ServoQueueItem item) {
-//   _servoQueue.push(&item);
-// };
-
-// void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed, ConnectServo *) {
-//     ServoQueueItem item;
-//     item.assign(newCall, newParam1, newAnimationType, newServoSpeed, NULL);
-//     _servoQueue.push(&item);
-// };
-
-// void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
-//     ServoQueueItem item;
-//     item.assign(newCall, newParam1, newAnimationType, newServoSpeed, NULL);
-//     _servoQueue.push(&item);
-// };
-
-// void ConnectServo::enqueue(uint8_t newCall, uint8_t newParam1) {
-//     ServoQueueItem item;
-//     item.assign(newCall, newParam1, NULL, NULL, NULL);
-//     _servoQueue.push(&item);
-// };
