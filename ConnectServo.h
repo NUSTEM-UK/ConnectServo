@@ -17,6 +17,7 @@
 #define WAIT_FOR_SERVO 2
 #define WAIT_FOR_LEDS 3
 #define MESSAGE_SERVO 4
+#define WAIT 5
 
 // Helper function to dispatch both sides of the block/unblock callback
 void servoWaitForServo(ConnectServo&, ConnectServo&);
@@ -30,9 +31,7 @@ class ConnectServo : public ServoEasing {
         void queueMoveTo(uint8_t);
         void queueWaitForServo(uint8_t);
         void queueMessageServo(uint8_t);
-        // void enqueue(uint8_t, uint8_t, uint8_t, uint16_t, ConnectServo);
-        // void enqueue(uint8_t, uint8_t, uint8_t, uint16_t);
-        // void enqueue(uint8_t, uint8_t);
+        void queueWait(uint16_t);
         ServoQueueItem dequeue();
         void registerServo();
         void unblockFromServo(uint8_t);
@@ -46,6 +45,9 @@ class ConnectServo : public ServoEasing {
         // Wait blocks are ints rather than bools so they can store the unblocking object ID (pin number))
         uint8_t _waitingForServo;
         uint8_t _waitingForLED;
+        bool _waitingForTime;
+        unsigned long _targetTime;
+        void checkTime();
 };
 
 #endif
