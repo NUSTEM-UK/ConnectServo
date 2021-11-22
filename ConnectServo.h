@@ -1,3 +1,7 @@
+
+#ifndef ConnectServo_h
+#define ConnectServo_h
+
 #include <Arduino.h>
 #include <ServoEasing.h>
 #include <cppQueue.h>
@@ -14,7 +18,7 @@
 #define WAIT_FOR_LEDS 3
 #define MESSAGE_SERVO 4
 
-ServoMessenger ConnectMessenger;
+extern ServoMessenger ConnectMessenger;
 
 class ConnectServo : public ServoEasing {
     public:
@@ -42,3 +46,5 @@ class ConnectServo : public ServoEasing {
         uint8_t _waitingForServo;
         uint8_t _waitingForLED;
 };
+
+#endif

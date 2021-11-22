@@ -1,5 +1,7 @@
 #include <ConnectServo.h>
 
+ServoMessenger ConnectMessenger;
+
 // Initialize the servo object, passing an initializer list to the cppQueue object
 // See http://arduinoetcetera.blogspot.com/2011/01/classes-within-classes-initialiser.html
 ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_ITEMS, IMPLEMENTATION) {
@@ -18,7 +20,7 @@ uint8_t ConnectServo::getPin() {
 }
 
 void ConnectServo::registerServo() {
-    ConnectMessenger.registerServo(&this, _servoPin);
+    ConnectMessenger.registerServo(this, _servoPin);
 }
 
 void ConnectServo::queueEaseTo(uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
@@ -48,8 +50,10 @@ void ConnectServo::queueMessageServo(uint8_t targetServo) {
 void ConnectServo::unblockFromServo(uint8_t signallingServoID) {
     if (signallingServoID == _waitingForServo) {
         // Signal received from blocking object
-        Serial.println("BLOCK LIFTED");
-        _waitingForServo = 0;
+        Serial.print("Servo on pin: ");
+        Serial.print(_servoPin);
+        Serial.println(": BLOCK LIFTED");
+        _waitingForServo = false;
     }
 }
 
@@ -66,9 +70,11 @@ bool ConnectServo::update() {
 
     // Now check to see if we've stopped and shouldn't have
     if (!isMovingAndCallYield() && !_waitingForServo && !_waitingForLED) {
-        // Serial.println("Servo stopped, retrieving next queue action.");
         // We've stopped, so check if there's anything in the queue
         if (!_servoQueue.isEmpty()) {
+            Serial.print("Servo on pin: ");
+            Serial.print(_servoPin);
+            Serial.println(": stopped, retrieving next queue action.");
             // Serial.println("Popping next action");
             // There's something in the queue, so pop it and execute it
             ServoQueueItem item = dequeue();
@@ -80,6 +86,10 @@ bool ConnectServo::update() {
             // Hence the parser macro definitions
             switch (item.call) {
                 case STARTEASETO:
+                    Serial.print("Servo on pin: ");
+                    Serial.print(_servoPin);
+                    Serial.println(": START EASING MOVE");
+                    attach(_servoPin);
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);
                     // Serial.print("Ease move dispatched: ");
@@ -95,9 +105,11 @@ bool ConnectServo::update() {
                     Serial.println(item.param1);
                     break;
                 case WAIT_FOR_SERVO:
-                    Serial.println("WAIT FOR SERVO triggered");
+                    Serial.print("Servo on pin: ");
+                    Serial.print(_servoPin);
+                    Serial.print(": BLOCK FOR SERVO on pin ");
+                    Serial.println(item.targetServo);
                     _waitingForServo = item.targetServo;
-                    Serial.println("BLOCK SET");
                     // uint8_t targetServoID = item.targetServo;
                     // gConnectEventManager.addListener(getPin(), this->unblockFromServo);
                     // Queue a MessageServo event passing item.targetServo as identifier
@@ -108,9 +120,11 @@ bool ConnectServo::update() {
                     Serial.println("WAIT FOR LEDS: Yeah, we need to implement this");
                     break;
                 case MESSAGE_SERVO:
-                    Serial.println("MESSAGE SERVO triggered");
-                    gConnectEventManager.queueEvent(_servoPin, item.targetServo);
-                    // item.targetServo->unblockFromServo();
+                    Serial.print("Servo on pin: ");
+                    Serial.print(_servoPin);
+                    Serial.print(": MESSAGE SERVO triggered to servo on: ");
+                    Serial.println(item.targetServo);
+                    ConnectMessenger.sendServoMessage(item.targetServo, getPin());
                     break;
                 default:
                     break;

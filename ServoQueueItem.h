@@ -1,3 +1,5 @@
+#ifndef ServoQueueItem_h
+#define ServoQueueItem_h
 #include <Arduino.h>
 
 // Generic function pointer. Note variable-length argument list
@@ -12,7 +14,7 @@
 // } servoQueueItem;
 
 // Forward declaration of ConnectServo class
-class ConnectServo;
+// class ConnectServo;
 
 class ServoQueueItem {
     public:
@@ -25,3 +27,5 @@ class ServoQueueItem {
         uint16_t servoSpeed;            // Slew rate (perscentage: map to 0-255. Servo theoretical max is around 200 degrees/sec, ~80%)
         uint8_t targetServo;            // Servo pins are of type static const uint8_t
 };
+
+#endif
