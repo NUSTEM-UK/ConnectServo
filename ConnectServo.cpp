@@ -112,6 +112,14 @@ void ConnectServo::update() {
             ServoQueueItem item = dequeue();
             // Item popped from queue, so flag that.
             _emptiedQueue = false;
+            // Re-attach the servo
+            if (!_servoAttached) {
+                Serial.print("Servo on pin: ");
+                Serial.print(_servoPin);
+                Serial.println(": re-attaching.");
+                attach(_servoPin);
+                _servoAttached = true;
+            }
 
             // Get the targetFunction from item.call
             // Decaode the call and dispatch.
