@@ -25,7 +25,7 @@
 // This isn't quite enough for a 180 degree move, but
 // at least the servo twitches. Adding more delay
 // could be done with queueWait().
-#define SERVO_MOVE_SLEW_WAIT 150
+#define SERVO_MOVE_SLEW_WAIT 300
 
 // Helper function to dispatch both sides of the block/unblock callback
 void servoWaitForServo(ConnectServo&, ConnectServo&);

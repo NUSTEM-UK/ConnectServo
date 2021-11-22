@@ -1,7 +1,6 @@
 #ifndef ServoMessenger_h
 #define ServoMessenger_h
 #include <Arduino.h>
-// #include <ConnectServo.h> // TODO: circular declaration?
 
 // Forward declaration of ConnectServo class
 class ConnectServo;
