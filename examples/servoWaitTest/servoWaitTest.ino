@@ -23,21 +23,12 @@ void setup() {
     servo1.queueEaseTo(180, EASE_CUBIC_IN_OUT, 60);
     servo2.queueEaseTo(180, EASE_CUBIC_IN_OUT, 60);
     servo2.queueMoveTo(0);
+    servo2.queueMoveTo(180);
+    servo2.queueMoveTo(0);
+    // servo2.queueWait(500);
 }
 
 void loop() {
-    // servo1.update();
-    // servo2.update();
-    // TODO: Need a timeout on detach, and some neater way of re-attaching the servos.
-    if (!servo1.update()) {
-        // It's stopped with an empty queue, so we're done
-        // Serial.println("Disconnecting servo 1");
-        servo1.detach();
-        // TODO: Ah, this triggers every pass through the loop. Oops.
-    }
-    if (!servo2.update()) {
-        // It's stopped with an empty queue, so we're done
-        // Serial.println("Disconnecting servo 2");
-        servo2.detach();
-    }
+    servo1.update();
+    servo2.update();
 }

@@ -13,6 +13,7 @@ void ConnectServo::setPin(uint8_t pin) {
     attach(_servoPin);
     write(0);
     registerServo();
+    _servoAttached = true;
 }
 
 uint8_t ConnectServo::getPin() {
@@ -39,6 +40,8 @@ void ConnectServo::queueMoveTo(uint8_t newParam1) {
     //        needs timeout on detach at end of move.
     item.assign(STARTEASETO, newParam1, EASE_LINEAR, 1023, NULL);
     _servoQueue.push(&item);
+    item.assign(WAIT, NULL, NULL, SERVO_MOVE_SLEW_WAIT, NULL);
+    _servoQueue.push(&item);
 };
 
 void ConnectServo::queueWaitForServo(uint8_t targetServoID) {
@@ -63,29 +66,57 @@ void ConnectServo::unblockFromServo(uint8_t signallingServoID) {
     }
 }
 
+void ConnectServo::queueWait(uint16_t waitTime) {
+    ServoQueueItem item;
+    item.assign(WAIT, NULL, NULL, waitTime, NULL);
+    _servoQueue.push(&item);
+};
+
 ServoQueueItem ConnectServo::dequeue() {
     ServoQueueItem _item;
     _servoQueue.pop(&_item);
     return _item;
 };
 
-bool ConnectServo::update() {
-    // Need to call processEvent() on the event manager, to trigger release of
-    // messages. TODO: move this into ConnectLib
+void ConnectServo::checkTime() {
+    if (_waitingForTime) {
+        if (millis() > _targetTime) {
+            _waitingForTime = false;
+        }
+    } else if (_emptiedQueue && _servoAttached) {
+        if (millis() > _lastUpdate + SERVO_TIMEOUT_MS) {
+            Serial.print("Servo on pin: ");
+            Serial.print(_servoPin);
+            Serial.println(": TIMEOUT, detaching");
+            detach();
+            // Unset the flag so we don't try to detach again
+            _servoAttached = false;
+        }
+    }
+};
 
+void ConnectServo::update() {
 
-    // Now check to see if we've stopped and shouldn't have
-    if (!isMovingAndCallYield() && !_waitingForServo && !_waitingForLED) {
+    // Check if we're paused
+    checkTime();
+
+    // Check to see if we've stopped and shouldn't have.
+    // isMovingAndCallYield works for us, despite being deprecated.
+    // Alternative of areInterruptsActive() breaks simultaneous
+    // servo movement on ESP8266. So... let's not do that.
+    // Also need to check our blocking flags.
+    if (!isMovingAndCallYield() && !_waitingForServo && !_waitingForLED && !_waitingForTime) {
         // We've stopped, so check if there's anything in the queue
         if (!_servoQueue.isEmpty()) {
             Serial.print("Servo on pin: ");
             Serial.print(_servoPin);
             Serial.println(": stopped, retrieving next queue action.");
-            // Serial.println("Popping next action");
             // There's something in the queue, so pop it and execute it
             ServoQueueItem item = dequeue();
-            // Get the targetFunction from item.call
+            // Item popped from queue, so flag that.
+            _emptiedQueue = false;
 
+            // Get the targetFunction from item.call
             // Decaode the call and dispatch.
             // This is hacky, but I can't pass a pointer to a member function
             // since - as best I can tell - C++ doesn't do that.
@@ -94,18 +125,10 @@ bool ConnectServo::update() {
                 case STARTEASETO:
                     Serial.print("Servo on pin: ");
                     Serial.print(_servoPin);
-                    Serial.println(": START EASING MOVE");
-                    // FIXME: This is to work around over-zealous detach in
-                    //        example code main loop. Needs a timeout on detach.
-                    attach(_servoPin);
+                    Serial.print(": START EASING MOVE to ");
+                    Serial.println(item.param1);
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);
-                    // Serial.print("Ease move dispatched: ");
-                    // Serial.print(item.param1);
-                    // Serial.print(" ");
-                    // Serial.print(item.animationType);
-                    // Serial.print(" ");
-                    // Serial.println(item.servoSpeed);
                     break;
                 case WRITE:
                     write(item.param1);
@@ -134,12 +157,29 @@ bool ConnectServo::update() {
                     Serial.println(item.targetServo);
                     ConnectMessenger.sendServoMessage(item.targetServo, getPin());
                     break;
+                case WAIT:
+                    Serial.print("Servo on pin: ");
+                    Serial.print(_servoPin);
+                    Serial.print(": WAIT for ");
+                    Serial.println(item.servoSpeed);
+                    // Set wait flag
+                    _waitingForTime = true;
+                    // Set wait end point
+                    _targetTime = millis() + item.servoSpeed;
+                    break;
                 default:
                     break;
             }
-            return true;
         } else {
-            return false;
+            // If this is the first tme we've falled through queue check,
+            // flag that and take a tiemstamp.
+            if (!_emptiedQueue) {
+                Serial.print("Servo on pin: ");
+                Serial.print(_servoPin);
+                Serial.println(": Queue emptied, triggering timeout wait");
+                _emptiedQueue = true;
+                _lastUpdate = millis();
+            }
         }
     }
 };
