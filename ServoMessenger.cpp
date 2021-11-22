@@ -11,6 +11,16 @@
 //     servoPin = NULL;
 // };
 
+
+/**
+ * Helper function to enqueue events for both sides of a waitfor/message pair
+ */
+void servoWaitForServo(ConnectServo& servoWaiting, ConnectServo& waitingFor) {
+    servoWaiting.queueWaitForServo(waitingFor.getPin());
+    waitingFor.queueMessageServo(servoWaiting.getPin());
+}
+
+
 // ServoMessenger initialiser
 ServoMessenger::ServoMessenger() {
   uint8_t _servoCount = 0;

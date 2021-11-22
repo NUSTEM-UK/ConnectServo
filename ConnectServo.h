@@ -18,7 +18,8 @@
 #define WAIT_FOR_LEDS 3
 #define MESSAGE_SERVO 4
 
-extern ServoMessenger ConnectMessenger;
+// Helper function to dispatch both sides of the block/unblock callback
+void servoWaitForServo(ConnectServo&, ConnectServo&);
 
 class ConnectServo : public ServoEasing {
     public:

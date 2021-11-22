@@ -31,7 +31,13 @@ void ConnectServo::queueEaseTo(uint8_t newParam1, uint8_t newAnimationType, uint
 
 void ConnectServo::queueMoveTo(uint8_t newParam1) {
     ServoQueueItem item;
-    item.assign(WRITE, newParam1, NULL, NULL, NULL);
+    // item.assign(WRITE, newParam1, NULL, NULL, NULL);
+    // TODO: Check if we can get write() to work, but it looks like
+    // ServoEasing thinks the transit time is 0 so dequeing is cruddy.
+    // Hence we fudge it with a maximum-rate linear ease to.
+    // FIXME: this doesn't complete before the servo is detached either.
+    //        needs timeout on detach at end of move.
+    item.assign(STARTEASETO, newParam1, EASE_LINEAR, 1023, NULL);
     _servoQueue.push(&item);
 };
 
@@ -89,6 +95,8 @@ bool ConnectServo::update() {
                     Serial.print("Servo on pin: ");
                     Serial.print(_servoPin);
                     Serial.println(": START EASING MOVE");
+                    // FIXME: This is to work around over-zealous detach in
+                    //        example code main loop. Needs a timeout on detach.
                     attach(_servoPin);
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);

@@ -4,24 +4,18 @@
 ConnectServo servo1;
 ConnectServo servo2;
 
-// Instantiate an object to hold our tempoorary values
-ServoQueueItem myItem;
-
 uint8_t i = 0;
 
 void setup() {
     Serial.begin(115200);
     Serial.println();
     Serial.println("Starting...");
-    servo1.attach(D5);
-    servo1.write(0);
-    servo2.attach(D7);
-    servo2.write(0);
+    servo1.setPin(D5);
+    servo2.setPin(D7);
     delay(500);
 
     // Queue some moves for the servo objects
     servo1.queueEaseTo(180, EASE_CUBIC_IN_OUT, 30);
-    // servo1.enqueue(myItem);
     servo1.queueMoveTo(0);
     servo1.queueEaseTo(90, EASE_SINE_IN, 100);
     servo1.queueMoveTo(180);
@@ -37,7 +31,7 @@ void setup() {
         servo2.queueEaseTo(0, EASE_LINEAR, 255);
         i++;
     }
-    servo2.queueEaseTo(STARTEASETO, 180, EASE_CUBIC_IN_OUT, 20);
+    servo2.queueEaseTo(180, EASE_CUBIC_IN_OUT, 20);
 
 }
 
