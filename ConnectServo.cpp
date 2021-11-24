@@ -2,6 +2,10 @@
 
 ServoMessenger ConnectMessenger;
 
+void updateConnectServos() {
+    ConnectMessenger.updateServos();
+}
+
 // Initialize the servo object, passing an initializer list to the cppQueue object
 // See http://arduinoetcetera.blogspot.com/2011/01/classes-within-classes-initialiser.html
 ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_ITEMS, IMPLEMENTATION) {
