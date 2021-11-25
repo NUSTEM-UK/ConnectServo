@@ -2,6 +2,9 @@
 
 ServoMessenger ConnectMessenger;
 
+// This was a helper fucntion for ConnectLib, but for whatever reason it turned
+// out to be rather slow. We now reference ServoMessenger ConnectMessenger as
+// extern in Connect.h, and invoke ConnectMessenger.updateServo() in connectLoop().
 void updateConnectServos() {
     ConnectMessenger.updateServos();
 }
