@@ -20,6 +20,15 @@ void servoWaitForServo(ConnectServo& servoWaiting, ConnectServo& waitingFor) {
     waitingFor.queueMessageServo(servoWaiting.getPin());
 }
 
+/**
+ * Call update() on all ConnectServo objects
+ */
+void ServoMessenger::updateServos() {
+    // Iterate over servoList
+    for (uint8_t i = 0; i < _servoCount; i++) {
+        _servoList[i].servoReference->update();
+    }
+}
 
 // ServoMessenger initialiser
 ServoMessenger::ServoMessenger() {

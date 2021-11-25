@@ -29,6 +29,8 @@
 
 // Helper function to dispatch both sides of the block/unblock callback
 void servoWaitForServo(ConnectServo&, ConnectServo&);
+// Helper function to update all servos registered with ServoMessenger object
+void updateConnectServio();
 
 class ConnectServo : public ServoEasing {
     public:
