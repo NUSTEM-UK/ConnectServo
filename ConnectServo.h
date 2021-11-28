@@ -5,8 +5,8 @@
 #include <Arduino.h>
 #include <ServoEasing.h>
 #include <cppQueue.h>
-#include <ServoQueueItem.h>
-#include <ServoMessenger.h>
+#include "ServoQueueItem.h"
+#include "ServoMessenger.h"
 
 #define IMPLEMENTATION FIFO
 #define QUEUE_SIZE_ITEMS 20
