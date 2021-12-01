@@ -2,6 +2,13 @@
 
 ServoMessenger ConnectMessenger;
 
+// This was a helper fucntion for ConnectLib, but for whatever reason it turned
+// out to be rather slow. We now reference ServoMessenger ConnectMessenger as
+// extern in Connect.h, and invoke ConnectMessenger.updateServo() in connectLoop().
+void updateConnectServos() {
+    ConnectMessenger.updateServos();
+}
+
 // Initialize the servo object, passing an initializer list to the cppQueue object
 // See http://arduinoetcetera.blogspot.com/2011/01/classes-within-classes-initialiser.html
 ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_ITEMS, IMPLEMENTATION) {
