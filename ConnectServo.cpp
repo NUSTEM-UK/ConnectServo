@@ -63,9 +63,9 @@ void ConnectServo::queueMessageServo(uint8_t targetServo) {
 void ConnectServo::unblockFromServo(uint8_t signallingServoID) {
     if (signallingServoID == _waitingForServo) {
         // Signal received from blocking object
-        Serial.print("Servo on pin: ");
+        Serial.print(F("Servo on pin: "));
         Serial.print(_servoPin);
-        Serial.println(": BLOCK LIFTED");
+        Serial.println(F(": BLOCK LIFTED"));
         _waitingForServo = false;
     }
 }
@@ -89,9 +89,9 @@ void ConnectServo::checkTime() {
         }
     } else if (_emptiedQueue && _servoAttached) {
         if (millis() > _lastUpdate + SERVO_TIMEOUT_MS) {
-            Serial.print("Servo on pin: ");
+            Serial.print(F("Servo on pin: "));
             Serial.print(_servoPin);
-            Serial.println(": TIMEOUT, detaching");
+            Serial.println(F(": TIMEOUT, detaching"));
             detach();
             // Unset the flag so we don't try to detach again
             _servoAttached = false;
@@ -112,18 +112,18 @@ void ConnectServo::update() {
     if (!isMovingAndCallYield() && !_waitingForServo && !_waitingForLED && !_waitingForTime) {
         // We've stopped, so check if there's anything in the queue
         if (!_servoQueue.isEmpty()) {
-            Serial.print("Servo on pin: ");
+            Serial.print(F("Servo on pin: "));
             Serial.print(_servoPin);
-            Serial.println(": stopped, retrieving next queue action.");
+            Serial.println(F(": stopped, retrieving next queue action."));
             // There's something in the queue, so pop it and execute it
             ServoQueueItem item = dequeue();
             // Item popped from queue, so flag that.
             _emptiedQueue = false;
             // Re-attach the servo
             if (!_servoAttached) {
-                Serial.print("Servo on pin: ");
+                Serial.print(F("Servo on pin: "));
                 Serial.print(_servoPin);
-                Serial.println(": re-attaching.");
+                Serial.println(F(": re-attaching."));
                 attach(_servoPin);
                 _servoAttached = true;
             }
@@ -135,41 +135,42 @@ void ConnectServo::update() {
             // Hence the parser macro definitions
             switch (item.call) {
                 case STARTEASETO:
-                    Serial.print("Servo on pin: ");
+                    Serial.print(F("Servo on pin: "));
                     Serial.print(_servoPin);
-                    Serial.print(": START EASING MOVE to ");
+                    Serial.print(F(": START EASING MOVE to "));
                     Serial.println(item.param1);
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);
                     break;
                 case WRITE:
                     write(item.param1);
-                    Serial.print("Servo on pin: ");
+                    Serial.print(F("Servo on pin: "));
                     Serial.print(_servoPin);
-                    Serial.print(": WRITE MOVE to ");
+                    Serial.print(F(": WRITE MOVE to "));
                     Serial.println(item.param1);
                     break;
                 case WAIT_FOR_SERVO:
-                    Serial.print("Servo on pin: ");
+                    Serial.print(F("Servo on pin: "));
                     Serial.print(_servoPin);
-                    Serial.print(": BLOCK FOR SERVO on pin ");
+                    Serial.print(F(": BLOCK FOR SERVO on pin "));
                     Serial.println(item.targetServo);
                     _waitingForServo = item.targetServo;
                     break;
                 case WAIT_FOR_LEDS:
-                    Serial.println("WAIT FOR LEDS: Yeah, we need to implement this");
+                    // TODO: Implement
+                    Serial.println(F("WAIT FOR LEDS: Yeah, we need to implement this"));
                     break;
                 case MESSAGE_SERVO:
-                    Serial.print("Servo on pin: ");
+                    Serial.print(F("Servo on pin: "));
                     Serial.print(_servoPin);
-                    Serial.print(": MESSAGE SERVO triggered to servo on: ");
+                    Serial.print(F(": MESSAGE SERVO triggered to servo on: "));
                     Serial.println(item.targetServo);
                     ConnectMessenger.sendServoMessage(item.targetServo, getPin());
                     break;
                 case WAIT:
-                    Serial.print("Servo on pin: ");
+                    Serial.print(F("Servo on pin: "));
                     Serial.print(_servoPin);
-                    Serial.print(": WAIT for ");
+                    Serial.print(F(": WAIT for "));
                     Serial.println(item.servoSpeed);
                     // Set wait flag
                     _waitingForTime = true;
@@ -183,9 +184,9 @@ void ConnectServo::update() {
             // If this is the first tme we've fallen through queue check,
             // flag that and take a tiemstamp.
             if (!_emptiedQueue) {
-                Serial.print("Servo on pin: ");
+                Serial.print(F("Servo on pin: "));
                 Serial.print(_servoPin);
-                Serial.println(": Queue emptied, triggering timeout wait");
+                Serial.println(F(": Queue emptied, triggering timeout wait"));
                 _emptiedQueue = true;
                 _lastUpdate = millis();
             }

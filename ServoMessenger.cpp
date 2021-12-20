@@ -40,7 +40,7 @@ void ServoMessenger::registerServo(ConnectServo* newServo, uint8_t newServoPin) 
     _servoList[_servoCount].servoPin = newServoPin;
     _servoList[_servoCount].servoReference = newServo;
     _servoCount++;
-    Serial.print("Servo registered on pin: ");
+    Serial.print(F("Servo registered on pin: "));
     Serial.println(newServoPin);
     // TODO: remove debug code
     if (_servoCount > NUMBER_OF_SERVOS) {
