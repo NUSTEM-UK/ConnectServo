@@ -17,6 +17,7 @@ ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_IT
     _isHome = false;
     _homeSpeed = 15;
     _homePosition= 90;
+    _keepActive = false;
 };
 
 void ConnectServo::setPin(uint8_t pin) {
@@ -33,6 +34,14 @@ uint8_t ConnectServo::getPin() {
 
 void ConnectServo::registerServo() {
     ConnectMessenger.registerServo(this, _servoPin);
+}
+
+void ConnectServo::keepActive() {
+    _keepActive = true;
+}
+
+void ConnectServo::detachWhenIdle() {
+    _keepActive = false;
 }
 
 void ConnectServo::queueEaseTo(uint8_t newParam1, uint8_t newAnimationType, uint16_t newServoSpeed) {
@@ -128,7 +137,15 @@ void ConnectServo::checkTime() {
             Serial.print(F("Servo on pin: "));
             Serial.print(_servoPin);
             Serial.println(F(": TIMEOUT, detaching"));
-            detach();
+            // Check if we should stay active, and if so just skip this
+            // while setting the flag so the logic still works.
+            if (!_keepActive) {
+                detach();
+            } else {
+                Serial.print(F("Servo on pin: "));
+                Serial.print(_servoPin);
+                Serial.println(F(": FAKING detach, keepActive set"));
+            }
             // Unset the flag so we don't try to detach again
             _servoAttached = false;
         }

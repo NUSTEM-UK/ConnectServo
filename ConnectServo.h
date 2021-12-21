@@ -48,6 +48,8 @@ class ConnectServo : public ServoEasing {
         void unblockFromServo(uint8_t);
         void unblockFromLED(void);
         void setHome(uint8_t);
+        void keepActive();
+        void detachWhenIdle();
         void update();
     private:
         uint8_t _servoPin;
@@ -63,6 +65,7 @@ class ConnectServo : public ServoEasing {
         bool _goingHome;
         bool _isHome;
         bool _waitingForTime;
+        bool _keepActive;
         unsigned long _targetTime;
         unsigned long _lastUpdate;
         bool _emptiedQueue;
