@@ -12,16 +12,17 @@ void updateConnectServos() {
 // Initialize the servo object, passing an initializer list to the cppQueue object
 // See http://arduinoetcetera.blogspot.com/2011/01/classes-within-classes-initialiser.html
 ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_ITEMS, IMPLEMENTATION) {
-    // Go home when idle behaviour defaults to false
+    // Set some sane defaults
     _goHomeWhenIdle = false;
     _isHome = false;
     _homeSpeed = 15;
+    _homePosition= 90;
 };
 
 void ConnectServo::setPin(uint8_t pin) {
     _servoPin = pin;
     attach(_servoPin);
-    write(0);
+    write(_homePosition);
     registerServo();
     _servoAttached = true;
 }
@@ -86,7 +87,7 @@ ServoQueueItem ConnectServo::dequeue() {
 };
 
 void ConnectServo::setHome(uint8_t homePosition) {
-    // Set the defined home position, and enable go home movement.
+    // Set the defined home position, and enable go home movement (implicit in the set)
     _homePosition = homePosition;
     _goHomeWhenIdle = true;
 };
@@ -113,7 +114,7 @@ void ConnectServo::checkTime() {
             // ...and set flag to show we're moving home
             _goingHome = true;
         }
-    } else if (_goingHome) {
+    } else if (_goHomeWhenIdle && _goingHome) {
         // check if we're still going home
         if (!isMovingAndCallYield()) {
             // We've arrived home, so set flags accordingly
@@ -121,7 +122,7 @@ void ConnectServo::checkTime() {
             _isHome = true;
             _lastUpdate = millis();
         }
-    } else if (_emptiedQueue && _servoAttached && _isHome) {
+    } else if (_emptiedQueue && _servoAttached && (_isHome || !_goHomeWhenIdle) ) {
         // second pass through, we've gone home now we're looking to detach.
         if (millis() > _lastUpdate + SERVO_TIMEOUT_MS) {
             Serial.print(F("Servo on pin: "));
