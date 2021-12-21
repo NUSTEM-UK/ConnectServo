@@ -18,6 +18,7 @@
 #define WAIT_FOR_LEDS 3
 #define MESSAGE_SERVO 4
 #define WAIT 5
+#define GO_HOME 6 // Needed because slightly different behaviour to STARTEASETO
 
 // wait 3 seconds on queue empty before detaching servo
 #define SERVO_TIMEOUT_MS 3000
@@ -46,6 +47,7 @@ class ConnectServo : public ServoEasing {
         void registerServo();
         void unblockFromServo(uint8_t);
         void unblockFromLED(void);
+        void setHome(uint8_t);
         void update();
     private:
         uint8_t _servoPin;
@@ -55,6 +57,11 @@ class ConnectServo : public ServoEasing {
         // Wait blocks are ints rather than bools so they can store the unblocking object ID (pin number))
         uint8_t _waitingForServo;
         uint8_t _waitingForLED;
+        uint8_t _homePosition;
+        uint8_t _homeSpeed;
+        bool _goHomeWhenIdle;
+        bool _goingHome;
+        bool _isHome;
         bool _waitingForTime;
         unsigned long _targetTime;
         unsigned long _lastUpdate;

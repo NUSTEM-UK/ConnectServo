@@ -12,7 +12,10 @@ void updateConnectServos() {
 // Initialize the servo object, passing an initializer list to the cppQueue object
 // See http://arduinoetcetera.blogspot.com/2011/01/classes-within-classes-initialiser.html
 ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_ITEMS, IMPLEMENTATION) {
-
+    // Go home when idle behaviour defaults to false
+    _goHomeWhenIdle = false;
+    _isHome = false;
+    _homeSpeed = 15;
 };
 
 void ConnectServo::setPin(uint8_t pin) {
@@ -82,12 +85,44 @@ ServoQueueItem ConnectServo::dequeue() {
     return _item;
 };
 
+void ConnectServo::setHome(uint8_t homePosition) {
+    // Set the defined home position, and enable go home movement.
+    _homePosition = homePosition;
+    _goHomeWhenIdle = true;
+};
+
 void ConnectServo::checkTime() {
+    // TODO: This is pretty gnarly, and conflates WAIT queued actions with
+    //       servo timeout handling. Should probably refactor.
+    // Check if we're explicitly in a pause
     if (_waitingForTime) {
         if (millis() > _targetTime) {
             _waitingForTime = false;
         }
-    } else if (_emptiedQueue && _servoAttached) {
+    } else if (_emptiedQueue && _servoAttached && !_isHome && _goHomeWhenIdle && !_goingHome) {
+        // First pass through, we're looking to go home.
+        if (millis() > _lastUpdate + SERVO_TIMEOUT_MS) {
+            // If we're not in a pause, and the queue is empty, and we're not home,
+            // and we're supposed to go home when idle, go home.
+            Serial.print(F("Servo on pin: "));
+            Serial.print(_servoPin);
+            Serial.println(F(": TIMEOUT, going home"));
+            // We can move directly home; going via queue gets us in an _isHome loop...
+            setEasingType(EASE_CUBIC_IN_OUT);
+            startEaseTo(_homePosition, _homeSpeed);
+            // ...and set flag to show we're moving home
+            _goingHome = true;
+        }
+    } else if (_goingHome) {
+        // check if we're still going home
+        if (!isMovingAndCallYield()) {
+            // We've arrived home, so set flags accordingly
+            _goingHome = false;
+            _isHome = true;
+            _lastUpdate = millis();
+        }
+    } else if (_emptiedQueue && _servoAttached && _isHome) {
+        // second pass through, we've gone home now we're looking to detach.
         if (millis() > _lastUpdate + SERVO_TIMEOUT_MS) {
             Serial.print(F("Servo on pin: "));
             Serial.print(_servoPin);
@@ -101,7 +136,7 @@ void ConnectServo::checkTime() {
 
 void ConnectServo::update() {
 
-    // Check if we're paused
+    // Check if we're paused and handle timeouts
     checkTime();
 
     // Check to see if we've stopped and shouldn't have.
@@ -141,6 +176,8 @@ void ConnectServo::update() {
                     Serial.println(item.param1);
                     setEasingType(item.animationType);
                     startEaseTo(item.param1, item.servoSpeed);
+                    // Flag that we've moved from home
+                    _isHome = false;
                     break;
                 case WRITE:
                     write(item.param1);
@@ -148,6 +185,8 @@ void ConnectServo::update() {
                     Serial.print(_servoPin);
                     Serial.print(F(": WRITE MOVE to "));
                     Serial.println(item.param1);
+                    // Flag that we've moved from home
+                    _isHome = false;
                     break;
                 case WAIT_FOR_SERVO:
                     Serial.print(F("Servo on pin: "));
@@ -182,11 +221,11 @@ void ConnectServo::update() {
             }
         } else {
             // If this is the first tme we've fallen through queue check,
-            // flag that and take a tiemstamp.
+            // flag that and take a timestamp.
             if (!_emptiedQueue) {
                 Serial.print(F("Servo on pin: "));
                 Serial.print(_servoPin);
-                Serial.println(F(": Queue emptied, triggering timeout wait"));
+                Serial.println(F(": Queue emptied, triggering timeout actions"));
                 _emptiedQueue = true;
                 _lastUpdate = millis();
             }
