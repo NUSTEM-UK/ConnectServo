@@ -38,6 +38,7 @@ class ConnectServo : public ServoEasing {
         ConnectServo();
         void setPin(uint8_t);
         uint8_t getPin();
+        // Public values for serial control
         void queueEaseTo(uint8_t, uint8_t, uint16_t);
         void queueMoveTo(uint8_t);
         void queueWaitForServo(uint8_t);
@@ -51,6 +52,7 @@ class ConnectServo : public ServoEasing {
         void keepActive();
         void detachWhenIdle();
         void update();
+        void serialCommandedPosition(uint8_t);
     private:
         uint8_t _servoPin;
         cppQueue _servoQueue;
@@ -61,6 +63,8 @@ class ConnectServo : public ServoEasing {
         uint8_t _waitingForLED;
         uint8_t _homePosition;
         uint8_t _homeSpeed;
+        uint8_t _nextSerialPosition;
+        uint8_t _currentSerialPosition;
         bool _goHomeWhenIdle;
         bool _goingHome;
         bool _isHome;

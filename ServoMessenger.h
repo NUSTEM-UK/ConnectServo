@@ -25,6 +25,7 @@ class ServoMessenger {
         void registerServo(ConnectServo*, uint8_t);
         void sendServoMessage(uint8_t, uint8_t);
         void updateServos();
+        void serialCommand(String);
     private:
         registeredServo _servoList[NUMBER_OF_SERVOS];
         uint8_t _servoCount;
