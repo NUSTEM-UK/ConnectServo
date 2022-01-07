@@ -18,6 +18,8 @@ ConnectServo::ConnectServo() : _servoQueue(sizeof(ServoQueueItem), QUEUE_SIZE_IT
     _homeSpeed = 15;
     _homePosition= 90;
     _keepActive = false;
+    _nextSerialPosition = 0;
+    _currentSerialPosition = 0;
 };
 
 void ConnectServo::setPin(uint8_t pin) {
@@ -250,3 +252,25 @@ void ConnectServo::update() {
         }
     }
 };
+
+void ConnectServo::serialCommandedPosition(uint8_t newPosition) {
+    // Servos are lazy. They get jumpy if told repeatedly to go to
+    // where they already are. So we need to check if we're already there.
+    _nextSerialPosition = newPosition;
+    if (_nextSerialPosition != _currentSerialPosition) {
+        // We _have_ moved, so ... move there.
+        // Re-attach the servo if necessary
+        if (!_servoAttached) {
+            Serial.print(F("Servo on pin: "));
+            Serial.print(_servoPin);
+            Serial.println(F(": re-attaching."));
+            attach(_servoPin);
+            _servoAttached = true;
+        }
+        // and ... go!
+        write(_nextSerialPosition);
+        // and update current position
+        _currentSerialPosition = _nextSerialPosition;
+    }
+    delay(10);
+}

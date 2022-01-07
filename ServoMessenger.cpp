@@ -40,7 +40,7 @@ void ServoMessenger::registerServo(ConnectServo* newServo, uint8_t newServoPin) 
     _servoList[_servoCount].servoPin = newServoPin;
     _servoList[_servoCount].servoReference = newServo;
     _servoCount++;
-    Serial.print(F("Servo registered on pin: "));
+    Serial.print(F("ServoMessenger: Servo registered on pin: "));
     Serial.println(newServoPin);
     // TODO: remove debug code
     if (_servoCount > NUMBER_OF_SERVOS) {
@@ -56,5 +56,31 @@ void ServoMessenger::sendServoMessage(uint8_t fromServoPin, uint8_t toServoPin) 
             _servoList[i].servoReference->unblockFromServo(toServoPin);
             // _servoList[i].servoReference->unblockFromServo(fromServoPin);
         }
+    }
+}
+
+void ServoMessenger::serialCommand(String command) {
+    // Receive and parse incoming command string, dispatching
+    // position values to specified servos (if they exist)
+    // FIXME: There's no error handling here, we're recieving two and only two
+    //        three-digit integers, which are in range 0..180, with no checking.
+    // FIXME: This is kludgy, and I'm not sure how we'll come with more stuff in
+    //        the serial command, should it exist.
+    uint8_t firstServoCommandedPosition = command.substring(0, 3).toInt();
+    uint8_t secondServoCommandedPosition = command.substring(4, 7).toInt();
+    Serial.print(command);
+    Serial.print(F(" : parsed as: "));
+    Serial.print(firstServoCommandedPosition);
+    Serial.print(F(";"));
+    Serial.println(secondServoCommandedPosition);
+
+    // Handle first value
+    // Do we even have a registered servo?
+    if (_servoCount > 0) {
+        _servoList[0].servoReference->serialCommandedPosition(firstServoCommandedPosition);
+    }
+    // Same for second value
+    if (_servoCount > 1) {
+        _servoList[1].servoReference->serialCommandedPosition(secondServoCommandedPosition);
     }
 }
