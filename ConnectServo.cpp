@@ -272,5 +272,5 @@ void ConnectServo::serialCommandedPosition(uint8_t newPosition) {
         // and update current position
         _currentSerialPosition = _nextSerialPosition;
     }
-    delay(10);
+    // delay(10);
 }
