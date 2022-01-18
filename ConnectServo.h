@@ -9,7 +9,7 @@
 #include "ServoMessenger.h"
 
 #define IMPLEMENTATION FIFO
-#define QUEUE_SIZE_ITEMS 20
+#define QUEUE_SIZE_ITEMS 50
 
 // Parser macros
 #define STARTEASETO 0
@@ -53,6 +53,9 @@ class ConnectServo : public ServoEasing {
         void detachWhenIdle();
         void update();
         void serialCommandedPosition(uint8_t);
+        void wave(uint8_t, uint8_t, uint8_t);
+        void flap(uint8_t, uint8_t, uint8_t);
+        void bounce(uint8_t, uint8_t, uint8_t);
     private:
         uint8_t _servoPin;
         cppQueue _servoQueue;
