@@ -274,3 +274,55 @@ void ConnectServo::serialCommandedPosition(uint8_t newPosition) {
     }
     // delay(10);
 }
+
+void ConnectServo::wave(uint8_t repeats, uint8_t startPos, uint8_t endPos) {
+    // Canned animation sequence for quick programming
+    // Adds a bunch of stuff to the queue.
+    // In this case, a symetric, eased wave.
+
+    // Move to the start position
+    queueEaseTo(startPos, EASE_CUBIC_IN_OUT, 45);
+
+    // We're running the animation repeats times
+    for (uint8_t i = 0; i < repeats; i++) {
+        // queueEaseTo(endPos, EASE_SINE_BOUNCING, 150); // This isn't bad, but a bit lop-sided
+        queueEaseTo(endPos, EASE_CUBIC_IN_OUT, 100);
+        queueEaseTo(startPos, EASE_CUBIC_IN_OUT, 100);
+    }
+
+    // We should be able to let the queue handle the rest
+    // Specifically, returning the servo home.
+}
+
+void ConnectServo::flap(uint8_t repeats, uint8_t startPos, uint8_t endPos) {
+    // Canned animation sequeunce for quick programming
+    // Adds a bunch of stuff to the queue.
+    // In this case, an asymmetric 'fast down, slow up' flap.
+
+    // Move to the start position
+    queueEaseTo(startPos, EASE_CUBIC_IN_OUT, 45);
+
+    // Run the animation repeats times
+    for (uint8_t i = 0; i < repeats; i++) {
+        // queueEaseTo(endPos, EASE_CUBIC_IN, 150);
+        queueMoveTo(endPos);
+        queueWait(50);
+        queueEaseTo(startPos, EASE_CUBIC_OUT, 45);
+    }
+}
+
+void ConnectServo::bounce(uint8_t repeats, uint8_t startPos, uint8_t endPos) {
+    // Canned animation sequeunce for quick programming
+    // Adds a bunch of stuff to the queue.
+    // In this case, an asymmetric bouncing motion.
+
+    // Move to the start position
+    queueEaseTo(startPos, EASE_CUBIC_IN_OUT, 45);
+
+    // Run the animation repeats times
+    for (uint8_t i = 0; i < repeats; i++) {
+        // queueEaseTo(endPos, EASE_QUADRATIC_BOUNCING, 255);
+        queueEaseTo(endPos, EASE_CUBIC_IN, 90);
+        queueEaseTo(startPos, EASE_CUBIC_OUT, 90);
+    }
+}
