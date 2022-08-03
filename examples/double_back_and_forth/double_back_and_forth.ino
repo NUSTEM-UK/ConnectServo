@@ -9,8 +9,8 @@ int servo1_max = 54;
 boolean servo1_going_up = true;
 
 static const uint8_t servo2Pin = D5;
-int servo2_min = 14;
-int servo2_max = 160;
+int servo2_min = 90;
+int servo2_max = 176;
 boolean servo2_going_up = true;
 
 void servo1nextAction() {
