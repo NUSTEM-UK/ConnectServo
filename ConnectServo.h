@@ -8,6 +8,10 @@
 #include "ServoQueueItem.h"
 #include "ServoMessenger.h"
 
+#ifdef Kniwwelino_h
+#include "Kniwwelino.h"
+#endif
+
 #define IMPLEMENTATION FIFO
 #define QUEUE_SIZE_ITEMS 50
 
@@ -56,6 +60,9 @@ class ConnectServo : public ServoEasing {
         void wave(uint8_t, uint8_t, uint8_t);
         void flap(uint8_t, uint8_t, uint8_t);
         void bounce(uint8_t, uint8_t, uint8_t);
+        #ifdef Kniwwelino_h
+        void callKniwwelinoUpdate();
+        #endif
     private:
         uint8_t _servoPin;
         cppQueue _servoQueue;
