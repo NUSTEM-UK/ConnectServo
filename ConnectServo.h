@@ -3,7 +3,7 @@
 #define ConnectServo_h
 
 #include <Arduino.h>
-#include <ServoEasing.h>
+#include "ServoEasing.hpp"
 #include <cppQueue.h>
 #include "ServoQueueItem.h"
 #include "ServoMessenger.h"
