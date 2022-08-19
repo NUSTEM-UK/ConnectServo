@@ -35,7 +35,8 @@
 // Helper function to dispatch both sides of the block/unblock callback
 void servoWaitForServo(ConnectServo&, ConnectServo&);
 // Helper function to update all servos registered with ServoMessenger object
-void updateConnectServio();
+void updateConnectServos();
+
 
 class ConnectServo : public ServoEasing {
     public:
@@ -60,9 +61,6 @@ class ConnectServo : public ServoEasing {
         void wave(uint8_t, uint8_t, uint8_t);
         void flap(uint8_t, uint8_t, uint8_t);
         void bounce(uint8_t, uint8_t, uint8_t);
-        #ifdef Kniwwelino_h
-        void callKniwwelinoUpdate();
-        #endif
     private:
         uint8_t _servoPin;
         cppQueue _servoQueue;

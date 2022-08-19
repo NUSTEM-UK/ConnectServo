@@ -58,7 +58,7 @@ void ConnectServo::queueMoveTo(uint8_t newParam1) {
     item.assign(WRITE, newParam1, NULL, NULL, NULL);
     // item.assign(STARTEASETO, newParam1, EASE_LINEAR, 1023, NULL);
     _servoQueue.push(&item);
-    // Queue a short pause so there's somet movement.
+    // Queue a short pause so there's some movement.
     item.assign(WAIT, NULL, NULL, SERVO_MOVE_SLEW_WAIT, NULL);
     _servoQueue.push(&item);
 };
