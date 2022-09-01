@@ -3,7 +3,8 @@
 #define ConnectServo_h
 
 #include <Arduino.h>
-#include "ServoEasing.hpp"
+#define SUPPRESS_HPP_WARNING
+#include <ServoEasing.h>
 #include <cppQueue.h>
 #include "ServoQueueItem.h"
 #include "ServoMessenger.h"
