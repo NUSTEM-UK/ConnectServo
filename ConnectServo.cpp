@@ -83,7 +83,7 @@ void ConnectServo::unblockFromServo(uint8_t signallingServoID) {
         Serial.println(F(": BLOCK LIFTED"));
         _waitingForServo = false;
     }
-}
+};
 
 void ConnectServo::queueWait(uint16_t waitTime) {
     ServoQueueItem item;
